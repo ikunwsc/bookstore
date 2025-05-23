@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>管理员控制台</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: url('/media/background/back_default1.jpg') no-repeat center center fixed;
+      background-size: cover;
+    }
+    .header {
+      background-color: #343a40;
+      color: white;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+    .admin-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .admin-name {
+      font-size: 16px;
+    }
+    .admin-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid white;
+    }
+    .logout-btn {
+      margin-left: 15px;
+      color: #ffc107;
+      cursor: pointer;
+      font-size: 14px;
+      text-decoration: underline;
+    }
+    .nav {
+      background-color: #495057;
+      display: flex;
+      justify-content: flex-start;
+      gap: 10px;
+      padding: 10px 30px;
+    }
+    .nav a {
+      color: white;
+      text-decoration: none;
+      font-size: 16px;
+      padding: 6px 12px;
+      border-radius: 4px;
+      transition: background-color 0.3s ease;
+    }
+    .nav a:hover {
+      background-color: #007bff;
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>管理员控制台</h1>
+  <div class="admin-info">
+    <span class="admin-name">欢迎，{{ admin_name }}</span>
+    <img class="admin-avatar" src="{{ admin_avatar }}" alt="管理员头像" />
+    <span class="logout-btn" onclick="logoutUser()">退出登录</span>
+    <input type="hidden" id="csrf-token" value="{{ csrf_token }}">
+  </div>
+</div>
+
+<div class="nav">
+  <a href="/user/list/">用户管理</a>
+  <a href="/book/list/">书籍管理</a>
+  <a href="/order/list/">订单管理</a>
+</div>
+
+<script>
+function logoutUser() {
+  const csrftoken = document.getElementById('csrf-token').value;
+
+  fetch('/logout/', {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': csrftoken,
+    }
+  }).then(response => {
+    if (response.ok) {
+      window.location.href = '/login/';
+    }
+  });
+}
+</script>
+
+</body>
+</html>

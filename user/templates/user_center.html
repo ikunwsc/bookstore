@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>个人中心</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: url('/media/background/back_default.jpg') no-repeat center center fixed;
+      background-size: cover;
+    }
+
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #007bff;
+      color: white;
+      padding: 10px 30px;
+    }
+
+    .nav-left a {
+      color: white;
+      text-decoration: none;
+      margin-right: 20px;
+      font-size: 16px;
+    }
+
+    .nav-left a:hover {
+      text-decoration: underline;
+    }
+
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid white;
+      margin-right: 10px;
+    }
+
+    .user-dropdown {
+      position: relative;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+    }
+
+    .user-name {
+      font-size: 16px;
+      color: white;
+      margin-left: 8px;
+    }
+
+    .dropdown-menu {
+      display: none;
+      position: absolute;
+      top: 45px;
+      right: 0;
+      background-color: white;
+      color: black;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      border-radius: 5px;
+      padding: 10px;
+      white-space: nowrap;
+      z-index: 1000;
+    }
+
+    .dropdown-menu a {
+      display: block;
+      padding: 10px 20px;
+      text-decoration: none;
+      color: black;
+      font-size: 14px;
+    }
+
+    .dropdown-menu a:hover {
+      text-decoration: underline;
+    }
+
+    .center-box {
+      width: 80%;
+      max-width: 1000px;
+      background-color: white;
+      margin: 50px auto;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      display: flex;
+      padding: 40px;
+    }
+
+    .sidebar {
+      width: 200px;
+      border-right: 1px solid #eee;
+      padding-right: 20px;
+    }
+
+    .sidebar .avatar-big {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #007bff;
+      display: block;
+      margin: 0 auto 20px;
+    }
+
+    .sidebar a {
+      display: block;
+      padding: 10px;
+      text-decoration: none;
+      color: #333;
+      font-size: 16px;
+      text-align: center;
+      border-radius: 4px;
+      margin-bottom: 10px;
+    }
+
+    .sidebar a:hover {
+      background-color: #f0f0f0;
+    }
+
+    .main-content {
+      flex-grow: 1;
+      padding-left: 30px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- 导航栏 -->
+<div class="navbar">
+  <div class="nav-left">
+    <a href="/user/home/">首页</a>
+    <a href="/shop/">购买</a>
+    <a href="/forum/">论坛</a>
+  </div>
+  <div class="nav-right">
+    <div class="user-dropdown" id="dropdown">
+      <img src="{{ avatar_url }}" alt="头像" class="avatar">
+      <div class="user-name" onclick="toggleDropdown()">{{ username }} ▼</div>
+      <div class="dropdown-menu" id="dropdownMenu">
+        <a href="/user/center/">个人主页</a>
+        <a href="/logout/">退出登录</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 内容区 -->
+<div class="center-box">
+  <div class="sidebar">
+    <img src="{{ avatar_url }}" alt="用户头像" class="avatar-big">
+    <a href="/user/edit/">编辑个人信息</a>
+    <a href="/user/orders/">管理订单</a>
+    <a href="/user/safety/">账号安全</a>
+  </div>
+
+  <div class="main-content">
+      {% block content %}
+    <h2>欢迎来到个人中心，{{ username }}</h2>
+    <p>请选择左侧的功能以进行操作喵~</p>
+      {% endblock %}
+  </div>
+
+</div>
+
+<script>
+  function toggleDropdown() {
+    const menu = document.getElementById("dropdownMenu");
+    menu.style.display = (menu.style.display === "block") ? "none" : "block";
+  }
+
+  document.addEventListener("click", function(e) {
+    const dropdown = document.getElementById("dropdown");
+    const menu = document.getElementById("dropdownMenu");
+    if (!dropdown.contains(e.target)) {
+      menu.style.display = "none";
+    }
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,98 @@
+{% extends "user_center.html" %}
+
+{% block title %}订单管理{% endblock %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 0 auto;">
+  {% if orders %}
+    <table id="order-table" style="width: 100%; border-collapse: collapse; margin-top: 20px; background-color: #fff; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+      <thead style="background-color: #007bff; color: white;">
+        <tr>
+          <th style="padding: 10px; border: 1px solid #ddd;">商品名称</th>
+          <th style="padding: 10px; border: 1px solid #ddd;">数量</th>
+          <th style="padding: 10px; border: 1px solid #ddd;">总价格</th>
+          <th style="padding: 10px; border: 1px solid #ddd;">状态</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order in orders %}
+        <tr>
+          <td style="padding: 10px; border: 1px solid #ddd;">{{ order.book.name }}</td>
+          <td style="padding: 10px; border: 1px solid #ddd;">{{ order.number }}</td>
+          <td style="padding: 10px; border: 1px solid #ddd;">{{ order.total_price }}￥</td>
+          <td style="padding: 10px; border: 1px solid #ddd;">
+            {% if order.status == "等待" %}
+              {{ order.status }}
+              <form method="post" action="/user/orders/pay/{{ order.id }}/" style="display:inline-block; margin-left: 10px;">
+                {% csrf_token %}
+                <button type="submit" style="background-color: #28a745; color: white; border: none; padding: 1px 10px; border-radius: 4px; cursor: pointer;">支付</button>
+              </form>
+            {% else %}
+              {{ order.status }}
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <!-- 分页按钮容器 -->
+    <div id="pagination" style="text-align: center; margin-top: 20px;"></div>
+
+  {% else %}
+    <p style="text-align: center; margin-top: 20px;">暂无订单信息。</p>
+  {% endif %}
+</div>
+
+<!-- 前端分页脚本 -->
+<script>
+  const rowsPerPage = 5;
+  const rows = Array.from(document.querySelectorAll("#order-table tbody tr"));
+  const totalPages = Math.ceil(rows.length / rowsPerPage);
+  let currentPage = 1;
+
+  function showPage(page) {
+    currentPage = page;
+    rows.forEach((row, index) => {
+      row.style.display = (index >= (page - 1) * rowsPerPage && index < page * rowsPerPage) ? '' : 'none';
+    });
+    renderPagination();
+  }
+
+  function renderPagination() {
+    const pagination = document.getElementById("pagination");
+    pagination.innerHTML = "";
+
+    if (totalPages <= 1) return;
+
+    if (currentPage > 1) {
+      const prevBtn = document.createElement("button");
+      prevBtn.innerText = "上一页";
+      prevBtn.onclick = () => showPage(currentPage - 1);
+      prevBtn.style = btnStyle();
+      pagination.appendChild(prevBtn);
+    }
+
+    const info = document.createElement("span");
+    info.innerText = `第 ${currentPage} 页，共 ${totalPages} 页`;
+    info.style = "margin: 0 10px;";
+    pagination.appendChild(info);
+
+    if (currentPage < totalPages) {
+      const nextBtn = document.createElement("button");
+      nextBtn.innerText = "下一页";
+      nextBtn.onclick = () => showPage(currentPage + 1);
+      nextBtn.style = btnStyle();
+      pagination.appendChild(nextBtn);
+    }
+  }
+
+  function btnStyle() {
+    return "margin: 0 5px; padding: 6px 12px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;";
+  }
+
+  document.addEventListener("DOMContentLoaded", function() {
+    showPage(1);
+  });
+</script>
+{% endblock %}

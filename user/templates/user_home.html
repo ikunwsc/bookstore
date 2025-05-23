@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>商城主页</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: url('/media/background/back_default.jpg') no-repeat center center fixed;
+      background-size: cover;
+    }
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #007bff;
+      color: white;
+      padding: 10px 30px;
+    }
+    .nav-left {
+      display: flex;
+      align-items: center;
+    }
+    .nav-left a {
+      color: white;
+      text-decoration: none;
+      margin-right: 20px;
+      font-size: 16px;
+    }
+    .nav-left a:hover {
+      text-decoration: underline;
+    }
+    .nav-right {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid white;
+      margin-right: 10px;
+    }
+    .user-dropdown {
+      position: relative;
+      cursor: pointer;
+    }
+    .user-name {
+      font-size: 16px;
+      color: white;
+    }
+    .dropdown-menu {
+      display: none;
+      position: absolute;
+      top: 45px;
+      right: 0;
+      background-color: white;
+      color: black;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      border-radius: 5px;
+      padding: 10px;
+      white-space: nowrap;
+      z-index: 1000;
+    }
+    .dropdown-menu a {
+  display: block; /* 每个选项单独一行 */
+  padding: 10px 20px;
+  text-decoration: none;
+  color: black;
+  font-size: 14px;
+}
+
+    .dropdown-menu a:hover {
+      text-decoration: underline;
+    }
+
+    .container {
+      padding: 40px;
+      text-align: center;
+    }
+    h1 {
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+
+<!-- 导航栏 -->
+<!-- 导航栏 -->
+<div class="navbar">
+  <div class="nav-left">
+    <a href="/user/home/">首页</a>
+    <a href="/shop/">购买</a>
+    <a href="/chat/">论坛</a>
+  </div>
+  <div class="nav-right">
+    <div class="user-dropdown" id="dropdown" style="display: flex; align-items: center;">
+      <img src="{{ avatar_url }}" alt="头像" class="avatar">
+      <div class="user-name" onclick="toggleDropdown()" style="margin-left: 8px;">{{ username }} ▼</div>
+      <div class="dropdown-menu" id="dropdownMenu">
+        <a href="/user/center/">个人主页</a>
+        <a href="/logout/">退出登录</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- 主体内容 -->
+<div class="container">
+  <h1>欢迎来到坤坤书城！</h1>
+  <p>您可以在这里查看您的信息，浏览商品，参与论坛讨论等~</p>
+</div>
+
+<script>
+    headers: {
+  'X-CSRFToken':csrftoken
+}
+
+  function toggleDropdown() {
+  const menu = document.getElementById('dropdownMenu');
+  menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+}
+
+// 点击页面其他区域自动关闭下拉框
+document.addEventListener('click', function (event) {
+  const dropdown = document.getElementById('dropdown');
+  const menu = document.getElementById('dropdownMenu');
+  if (!dropdown.contains(event.target)) {
+    menu.style.display = 'none';
+  }
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>订单列表</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: url('/media/background/back_default.jpg') no-repeat center center fixed;
+      background-size: cover;
+    }
+    .header {
+      background-color: #343a40;
+      color: white;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+    .admin-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .admin-name {
+      font-size: 16px;
+    }
+    .admin-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid white;
+    }
+    .logout-btn {
+      margin-left: 15px;
+      color: #ffc107;
+      cursor: pointer;
+      font-size: 14px;
+      text-decoration: underline;
+    }
+    .nav {
+      background-color: #495057;
+      display: flex;
+      justify-content: flex-start;
+      gap: 10px;
+      padding: 10px 30px;
+    }
+    .nav a {
+      color: white;
+      text-decoration: none;
+      font-size: 16px;
+      padding: 6px 12px;
+      border-radius: 4px;
+      transition: background-color 0.3s ease;
+    }
+    .nav a:hover {
+      background-color: #007bff;
+    }
+    h2 {
+      text-align: center;
+      margin-top: 30px;
+      color: white;
+    }
+    .filter-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+    .filter-container input, .filter-container select, .filter-container button {
+      padding: 8px;
+      font-size: 16px;
+    }
+    table {
+      border-collapse: collapse;
+      width: 90%;
+      margin: 20px auto;
+      background-color: #fff;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    th, td {
+      border: 1px solid #999;
+      padding: 10px;
+      text-align: center;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    .btn-container {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .btn-container a, .btn-container button {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #6c757d;
+      color: white;
+      text-decoration: none;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      margin: 5px;
+    }
+    .btn-container button.btn-danger {
+      background-color: #dc3545;
+    }
+    .btn-container button.btn-danger:hover {
+      background-color: #c82333;
+    }
+    .btn-container a:hover {
+      background-color: #5a6268;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>订单列表</h1>
+    <div class="admin-info">
+      <span class="admin-name">欢迎，{{ admin_name }}</span>
+      <img class="admin-avatar" src="{{ admin_avatar }}" alt="管理员头像">
+      <span class="logout-btn" onclick="logoutUser()">退出登录</span>
+      <input type="hidden" id="csrf-token" value="{{ csrf_token }}">
+    </div>
+  </div>
+
+  <div class="nav">
+    <a href="/user/list/">用户管理</a>
+    <a href="/book/list/">书籍管理</a>
+    <a href="/order/list/">订单管理</a>
+  </div>
+
+  <h2>订单信息列表</h2>
+
+  <!-- 筛选表单 -->
+  <form method="get" action="">
+    <div class="filter-container">
+      <input type="text" name="keyword" placeholder="搜索关键字" value="{{ request.GET.keyword }}">
+      <select name="status">
+        <option value="">全部</option>
+        <option value="waiting" {% if request.GET.status == 'waiting' %}selected{% endif %}>等待</option>
+        <option value="finished" {% if request.GET.status == 'finished' %}selected{% endif %}>结束</option>
+      </select>
+      <button type="submit">搜索</button>
+    </div>
+  </form>
+
+  <!-- 订单列表 -->
+  <form method="post" action="/order/del/">
+    {% csrf_token %}
+    <table>
+      <thead>
+        <tr>
+          <th><input type="checkbox" onclick="toggleAll(this)"></th>
+          <th>用户名</th>
+          <th>书名</th>
+          <th>数量</th>
+          <th>下单日期</th>
+          <th>状态</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order in orders %}
+        <tr>
+          <td><input type="checkbox" name="order_ids" value="{{ order.id }}"></td>
+          <td>{{ order.user.name }}</td>
+          <td>{{ order.book.name }}</td>
+          <td>{{ order.number }}</td>
+          <td>{{ order.date }}</td>
+          <td>{{ order.get_status_display }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6">没有订单喵~</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <!-- 底部按钮 -->
+    <div class="btn-container">
+      <button type="button" class="btn-danger" onclick="deleteSelected()">删除所选</button>
+      <a href="/order/add/">添加订单</a>
+      <a href="/adminhome/">返回</a>
+    </div>
+  </form>
+
+  <script>
+    function logoutUser() {
+      const csrftoken = document.getElementById('csrf-token').value;
+      fetch('/logout/', {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': csrftoken
+        }
+      }).then(response => {
+        if (response.ok) {
+          window.location.href = '/login/';
+        }
+      });
+    }
+
+    function toggleAll(source) {
+      const checkboxes = document.querySelectorAll('input[name="order_ids"]');
+      checkboxes.forEach(cb => cb.checked = source.checked);
+    }
+
+    function deleteSelected() {
+      const checkboxes = document.querySelectorAll('input[name="order_ids"]:checked');
+      const ids = Array.from(checkboxes).map(cb => cb.value);
+
+      if (ids.length === 0) {
+        alert("请选择要删除的订单喵~");
+        return;
+      }
+
+      fetch("/order/del/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": document.getElementById('csrf-token').value
+        },
+        body: JSON.stringify({ ids: ids })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert("删除成功喵~");
+          location.reload();
+        } else {
+          alert("删除失败喵：" + data.error);
+        }
+      })
+      .catch(error => {
+        alert("请求失败喵：" + error);
+      });
+    }
+  </script>
+</body>
+</html>
