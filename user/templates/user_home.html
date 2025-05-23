@@ -88,23 +88,24 @@
 </head>
 <body>
 
-<!-- 导航栏 -->
+
 <!-- 导航栏 -->
 <div class="navbar">
   <div class="nav-left">
     <a href="/user/home/">首页</a>
     <a href="/shop/">购买</a>
-    <a href="/chat/">论坛</a>
+    <a href="/forum/">论坛</a>
   </div>
   <div class="nav-right">
-    <div class="user-dropdown" id="dropdown" style="display: flex; align-items: center;">
-      <img src="{{ avatar_url }}" alt="头像" class="avatar">
-      <div class="user-name" onclick="toggleDropdown()" style="margin-left: 8px;">{{ username }} ▼</div>
-      <div class="dropdown-menu" id="dropdownMenu">
-        <a href="/user/center/">个人主页</a>
-        <a href="/logout/">退出登录</a>
-      </div>
-    </div>
+    <div class="user-dropdown" id="dropdown" onclick="toggleDropdown()" style="display: flex; align-items: center;">
+  <img src="{{ avatar_url }}" alt="头像" class="avatar">
+  <div class="user-name" style="margin-left: 8px;">{{ username }} ▼</div>
+  <div class="dropdown-menu" id="dropdownMenu">
+    <a href="/user/center/">个人主页</a>
+    <a href="/logout/">退出登录</a>
+  </div>
+</div>
+
   </div>
 </div>
 
@@ -116,11 +117,10 @@
 </div>
 
 <script>
-    headers: {
-  'X-CSRFToken':csrftoken
-}
 
-  function toggleDropdown() {
+
+
+   function toggleDropdown() {
   const menu = document.getElementById('dropdownMenu');
   menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
 }

@@ -4,6 +4,23 @@
   <meta charset="UTF-8">
   <title>订单列表</title>
   <style>
+      #pagination button {
+  margin: 0 4px;
+  padding: 6px 12px;
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+#pagination button.btn-active {
+  background-color: #007bff;
+  font-weight: bold;
+}
+#pagination button:hover {
+  background-color: #5a6268;
+}
+
     body {
       margin: 0;
       font-family: Arial, sans-serif;
@@ -167,10 +184,10 @@
           <th>状态</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody id="order-body">
         {% for order in orders %}
         <tr>
-          <td><input type="checkbox" name="order_ids" value="{{ order.id }}"></td>
+          <td><input type="checkbox" name="delete_ids" value="{{ order.id }}"></td>
           <td>{{ order.user.name }}</td>
           <td>{{ order.book.name }}</td>
           <td>{{ order.number }}</td>
@@ -182,16 +199,30 @@
         {% endfor %}
       </tbody>
     </table>
+    <div class="btn-container" id="pagination"></div>
 
     <!-- 底部按钮 -->
     <div class="btn-container">
+        <a href="/order/add/">添加订单</a>
       <button type="button" class="btn-danger" onclick="deleteSelected()">删除所选</button>
-      <a href="/order/add/">添加订单</a>
-      <a href="/adminhome/">返回</a>
+                <button type="button" onclick="alterSelected()" class="btn">修改所选</button>
+
     </div>
   </form>
 
   <script>
+      function alterSelected() {
+  const checkboxes = document.querySelectorAll('input[name="delete_ids"]:checked');
+  const ids = Array.from(checkboxes).map(cb => cb.value);
+
+  if (ids.length === 0) {
+    alert("请选择要修改的订单喵~");
+  } else if (ids.length > 1) {
+    alert("只能选择一个订单进行修改喵~");
+  } else {
+    window.location.href = `/order/alter/${ids[0]}`;
+  }
+}
     function logoutUser() {
       const csrftoken = document.getElementById('csrf-token').value;
       fetch('/logout/', {
@@ -207,12 +238,12 @@
     }
 
     function toggleAll(source) {
-      const checkboxes = document.querySelectorAll('input[name="order_ids"]');
+      const checkboxes = document.querySelectorAll('input[name="delete_ids"]');
       checkboxes.forEach(cb => cb.checked = source.checked);
     }
 
     function deleteSelected() {
-      const checkboxes = document.querySelectorAll('input[name="order_ids"]:checked');
+      const checkboxes = document.querySelectorAll('input[name="delete_ids"]:checked');
       const ids = Array.from(checkboxes).map(cb => cb.value);
 
       if (ids.length === 0) {
@@ -241,6 +272,39 @@
         alert("请求失败喵：" + error);
       });
     }
+    const rowsPerPage = 8;
+  const tableBody = document.getElementById('order-body');
+  const rows = Array.from(tableBody.querySelectorAll('tr'));
+  const paginationContainer = document.getElementById('pagination');
+
+  function displayPage(page) {
+    const start = (page - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+
+    rows.forEach((row, index) => {
+      row.style.display = (index >= start && index < end) ? '' : 'none';
+    });
+
+    updatePaginationButtons(page);
+  }
+
+  function updatePaginationButtons(currentPage) {
+    const totalPages = Math.ceil(rows.length / rowsPerPage);
+    paginationContainer.innerHTML = '';
+
+    for (let i = 1; i <= totalPages; i++) {
+      const btn = document.createElement('button');
+      btn.textContent = i;
+      btn.className = i === currentPage ? 'btn-active' : '';
+      btn.onclick = () => displayPage(i);
+      paginationContainer.appendChild(btn);
+    }
+  }
+
+  // 初始化分页
+  if (rows.length > 0) {
+    displayPage(1);
+  }
   </script>
 </body>
 </html>

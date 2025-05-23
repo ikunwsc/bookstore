@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <title>添加订单</title>
+  <title>修改订单</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -72,7 +72,7 @@
 <body>
 
 <div class="form-container">
-  <h2>添加订单</h2>
+  <h2>修改订单</h2>
 
   <form method="post">
     {% csrf_token %}
@@ -81,7 +81,7 @@
       <label for="user">选择用户：</label>
       <select name="user" id="user" required>
         {% for u in users %}
-        <option value="{{ u.id }}">{{ u.name }}</option>
+        <option value="{{ u.id }}" {% if u.id == order.user.id %}selected{% endif %}>{{ u.name }}</option>
         {% endfor %}
       </select>
     </div>
@@ -90,31 +90,31 @@
       <label for="book">选择书籍：</label>
       <select name="book" id="book" required>
         {% for b in books %}
-        <option value="{{ b.id }}">{{ b.name }}</option>
+        <option value="{{ b.id }}" {% if b.id == order.book.id %}selected{% endif %}>{{ b.name }}</option>
         {% endfor %}
       </select>
     </div>
 
     <div class="form-group">
       <label for="number">数量：</label>
-      <input type="number" name="number" id="number" min="1" value="1" required>
+      <input type="number" name="number" id="number" min="1" value="{{ order.number }}" required>
     </div>
 
     <div class="form-group">
       <label for="date">下单日期：</label>
-      <input type="date" name="date" id="date" value="{{ today|date:'Y-m-d' }}" required>
+      <input type="date" name="date" id="date" value="{{ order.date|date:'Y-m-d' }}" required>
     </div>
 
     <div class="form-group">
       <label for="status">状态：</label>
       <select name="status" id="status">
-        <option value="等待">等待</option>
-        <option value="结束">结束</option>
+        <option value="等待" {% if order.status == "等待" %}selected{% endif %}>等待</option>
+        <option value="结束" {% if order.status == "结束" %}selected{% endif %}>结束</option>
       </select>
     </div>
 
     <div class="form-group">
-      <button type="submit">提交订单</button>
+      <button type="submit">保存修改</button>
     </div>
 
     {% if msg %}

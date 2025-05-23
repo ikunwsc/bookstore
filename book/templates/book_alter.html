@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <title>添加订单</title>
+  <title>修改图书信息</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -11,35 +11,37 @@
     }
     .form-container {
       background-color: #fff;
-      padding: 20px 30px;
+      padding: 15px 20px;
       border-radius: 10px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      max-width: 400px;
+      max-width: 320px;
       margin: auto;
     }
     h2 {
       text-align: center;
+      font-size: 20px;
     }
     .form-group {
-      margin: 15px 0;
+      margin: 12px 0;
     }
     .form-group label {
       display: block;
       font-weight: bold;
-      margin-bottom: 5px;
+      margin-bottom: 4px;
     }
     .form-group input,
-    .form-group select {
+    .form-group select,
+    .form-group textarea {
       width: 100%;
-      padding: 8px;
+      padding: 6px;
       box-sizing: border-box;
     }
     .form-group button,
     .form-group a {
       width: 100%;
       display: inline-block;
-      padding: 10px;
-      font-size: 16px;
+      padding: 8px;
+      font-size: 15px;
       border: none;
       border-radius: 5px;
       cursor: pointer;
@@ -66,64 +68,72 @@
       color: red;
       text-align: center;
       margin-top: 10px;
+      font-size: 14px;
+    }
+    .cover-preview {
+      text-align: center;
+      margin-top: 10px;
+    }
+    .cover-preview img {
+      max-width: 100px;
+      border: 1px solid #ccc;
     }
   </style>
 </head>
 <body>
 
 <div class="form-container">
-  <h2>添加订单</h2>
+  <h2>修改图书信息</h2>
 
-  <form method="post">
+  <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
 
+    <!-- 书名 -->
     <div class="form-group">
-      <label for="user">选择用户：</label>
-      <select name="user" id="user" required>
-        {% for u in users %}
-        <option value="{{ u.id }}">{{ u.name }}</option>
-        {% endfor %}
-      </select>
+      <label for="name">书名</label>
+      <input type="text" id="name" name="name" value="{{ book.name }}" required>
     </div>
 
+    <!-- 作者 -->
     <div class="form-group">
-      <label for="book">选择书籍：</label>
-      <select name="book" id="book" required>
-        {% for b in books %}
-        <option value="{{ b.id }}">{{ b.name }}</option>
-        {% endfor %}
-      </select>
+      <label for="author">作者</label>
+      <input type="text" id="author" name="author" value="{{ book.author }}" required>
     </div>
 
+    <!-- 价格 -->
     <div class="form-group">
-      <label for="number">数量：</label>
-      <input type="number" name="number" id="number" min="1" value="1" required>
+      <label for="price">价格（元）</label>
+      <input type="number" id="price" name="price" step="any" value="{{ book.price }}" required>
     </div>
 
-    <div class="form-group">
-      <label for="date">下单日期：</label>
-      <input type="date" name="date" id="date" value="{{ today|date:'Y-m-d' }}" required>
+    <!-- 封面预览 -->
+    <div class="form-group cover-preview">
+      <label>当前封面：</label><br>
+      {% if book.cover.url %}
+        <img src="{{ book.cover.url }}" alt="封面">
+      {% else %}
+        <span>无封面</span>
+      {% endif %}
     </div>
 
+    <!-- 上传新封面 -->
     <div class="form-group">
-      <label for="status">状态：</label>
-      <select name="status" id="status">
-        <option value="等待">等待</option>
-        <option value="结束">结束</option>
-      </select>
+      <label for="cover">上传新封面</label>
+      <input type="file" id="cover" name="cover" accept="image/*">
     </div>
 
+    <!-- 提交 -->
     <div class="form-group">
-      <button type="submit">提交订单</button>
+      <button type="submit">保存修改</button>
     </div>
 
     {% if msg %}
-    <div class="tip">{{ msg }}</div>
+      <div class="tip">{{ msg }}</div>
     {% endif %}
   </form>
 
   <div class="form-group">
-    <a href="/order/list/">返回</a>
+    <a href="/book/list/">返回</a>
   </div>
 </div>
 

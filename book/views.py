@@ -1,5 +1,5 @@
 from django.db.models import Q
-from django.shortcuts import render,redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 import json
 from book.models import BookInfo
@@ -62,5 +62,16 @@ def book_list(request):
         'admin_avatar': admin_user.avatar.url if admin_user.avatar else 'media/avatars/default.jpg',
     }
     return render(request, 'book_list.html', context)
-
+def book_alter(request,book_id):
+    if not request.user.is_authenticated or request.user.group != 'admin':
+        return redirect('/login/')
+    alterbook = get_object_or_404(BookInfo, id=book_id)
+    if request.method == "POST":
+        alterbook.name = request.POST.get("name")
+        alterbook.price=request.POST.get('price')
+        alterbook.author=request.POST.get("author")
+        alterbook.cover = request.FILES.get('cover') if request.FILES.get('cover') else alterbook.cover
+        alterbook.save()
+        return render(request,'book_alter.html',{'book': alterbook,'msg':'修改成功'})
+    return render(request,'book_alter.html',{'book': alterbook})
 # Create your views here.

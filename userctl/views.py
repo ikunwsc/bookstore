@@ -1,4 +1,6 @@
-from django.shortcuts import render, redirect
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth import update_session_auth_hash
+from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Q
 from django.views.decorators.csrf import csrf_exempt
 
@@ -99,5 +101,19 @@ def user_del(request):
             return JsonResponse({"success": False, "error": str(e)})
     return JsonResponse({"success": False, "error": "无效请求"})
 
+def user_alter(request,user_id):
+    if not request.user.is_authenticated or request.user.group != 'admin':
+        return redirect('/login/')
+    alteruser = get_object_or_404(UserInfo, id=user_id)
+    if request.method == "POST":
+        alteruser.name = request.POST.get("name")
+        alteruser.age = int(request.POST.get("age"))
+        alteruser.sex=request.POST.get('sex')
+        alteruser.group=request.POST.get("group")
+        alteruser.avatar = request.FILES.get('avatar') if request.FILES.get('avatar') else alteruser.avatar
+        alteruser.password = make_password(request.POST.get("password"))
+        alteruser.save()
+        return render(request,'user_alter.html',{'user': alteruser,'ages':range(1,101),'msg':'修改成功'})
+    return render(request,'user_alter.html',{'user': alteruser,'ages':range(1,101)})
 # Create your views here.
 

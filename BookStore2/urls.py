@@ -48,7 +48,10 @@ urlpatterns = [
     path('user/edit/',user_views.user_edit),
     path('user/orders/',user_views.user_orders),
     path('user/orders/pay/<int:order_id>/',user_views.pay_order),
-    path('user/safety/',user_views.user_safety)
+    path('user/safety/',user_views.user_safety),
+    path('user/alter/<int:user_id>/',userctl_views.user_alter),
+    path('book/alter/<int:book_id>/',book_views.book_alter),
+    path('order/alter/<int:order_id>/',order_views.order_alter),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

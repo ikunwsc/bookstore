@@ -182,11 +182,23 @@
     <div class="btn-container">
       <a href="/book/add/">添加书籍</a>
       <button type="button" class="btn-danger" onclick="deleteSelected()">删除所选</button>
-      <a href="/adminhome/">返回首页</a>
+        <button type="button" onclick="alterSelected()" class="btn">修改所选</button>
     </div>
   </form>
 
   <script>
+      function alterSelected() {
+  const checkboxes = document.querySelectorAll('input[name="delete_ids"]:checked');
+  const ids = Array.from(checkboxes).map(cb => cb.value);
+
+  if (ids.length === 0) {
+    alert("请选择要修改的书籍喵~");
+  } else if (ids.length > 1) {
+    alert("只能选择一个书籍进行修改喵~");
+  } else {
+    window.location.href = `/book/alter/${ids[0]}`;
+  }
+}
     function logoutUser() {
       const csrftoken = document.getElementById('csrf-token').value;
       fetch('/logout/', {

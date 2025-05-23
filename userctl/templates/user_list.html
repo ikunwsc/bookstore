@@ -198,11 +198,23 @@
     <div class="btn-container">
       <a href="/user/add/" class="btn">添加用户</a>
       <button type="button" onclick="deleteSelected()" class="btn btn-danger">删除所选</button>
-      <a href="/adminhome/" class="btn">返回首页</a>
+        <button type="button" onclick="alterSelected()" class="btn">修改所选</button>
     </div>
   </form>
 
   <script>
+      function alterSelected() {
+  const checkboxes = document.querySelectorAll('input[name="delete_ids"]:checked');
+  const ids = Array.from(checkboxes).map(cb => cb.value);
+
+  if (ids.length === 0) {
+    alert("请选择要修改的用户喵~");
+  } else if (ids.length > 1) {
+    alert("只能选择一个用户进行修改喵~");
+  } else {
+    window.location.href = `/user/alter/${ids[0]}`;
+  }
+}
     function logoutUser() {
       const csrftoken = document.getElementById('csrf-token').value;
       fetch('/logout/', {
